@@ -55,3 +55,11 @@ print("Encoded text:", ids)
 
 decoded_text = tokeniser.decode(ids)
 print("Decoded text:", decoded_text)
+
+tokeniser = SimpleTokeniser(vocab)
+text = "Hello, do you like tea. Is this-- a test?"
+
+tokeniser.encode(text)
+
+all_tokens = sorted(list(set(preprocessed)))
+
