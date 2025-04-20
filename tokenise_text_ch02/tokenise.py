@@ -1,5 +1,10 @@
 import os
 import re
+import importlib
+import tiktoken
+
+print("tiktoken version:", importlib.metadata.version("tiktoken"))
+
 
 with open('tokenise_text_ch02/the-verdict.txt',"r", encoding="utf-8") as f:
     raw_text = f.read()
@@ -35,6 +40,10 @@ class SimpleTokeniser:
         preprocessed = [
             item.strip() for item in preprocessed if item.strip()
         ]
+        preprocessed = [
+            item if item in self.str_to_int 
+            else "<|unk|>" for item in preprocessed
+        ]
         ids = [self.str_to_int[s] for s in preprocessed]
         return ids
         
@@ -56,10 +65,30 @@ print("Encoded text:", ids)
 decoded_text = tokeniser.decode(ids)
 print("Decoded text:", decoded_text)
 
+all_tokens = sorted(list(set(preprocessed)))
+all_tokens.extend(["<|endoftext|>", "<|unk|>"])
+
+vocab = {token:integer for integer, token in enumerate(all_tokens)}
+
+len(vocab)
+
+len(all_tokens)
+
+len(vocab.items())
+
+for i, item in enumerate(list(vocab.items())[-5:]):
+    print(item)
+
 tokeniser = SimpleTokeniser(vocab)
-text = "Hello, do you like tea. Is this-- a test?"
+text1 = "Hello, do you like tea?"
+text2 = "In the sunlit terraces of the palace."
+
+text = " <|endoftext|> ".join((text1, text2))
+
+print(text)
 
 tokeniser.encode(text)
+print(tokeniser.encode(text))
 
-all_tokens = sorted(list(set(preprocessed)))
-
+tokeniser.decode(tokeniser.encode(text))
+print(tokeniser.decode(tokeniser.encode(text)))
