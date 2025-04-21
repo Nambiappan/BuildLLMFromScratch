@@ -1,6 +1,7 @@
 import os
 import re
 import importlib
+from importlib.metadata import version
 import tiktoken
 
 print("tiktoken version:", importlib.metadata.version("tiktoken"))
@@ -15,7 +16,7 @@ print(raw_text[:99])
 preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 preprocessed = [item.strip() for item in preprocessed if item.strip()]
 print("Total number of tokens:", len(preprocessed))
-print("First 30 tokens:", preprocessed[:30])
+# print("First 30 tokens:", preprocessed[:30])
 
 all_words = sorted(set(preprocessed))
 vocab_size = len(all_words)
@@ -60,21 +61,15 @@ text = """"It's the last he painted, you know,"
 
 ids = tokeniser.encode(text)
 
-print("Encoded text:", ids)
+#print("Encoded text:", ids)
 
 decoded_text = tokeniser.decode(ids)
-print("Decoded text:", decoded_text)
+#print("Decoded text:", decoded_text)
 
 all_tokens = sorted(list(set(preprocessed)))
 all_tokens.extend(["<|endoftext|>", "<|unk|>"])
 
 vocab = {token:integer for integer, token in enumerate(all_tokens)}
-
-len(vocab)
-
-len(all_tokens)
-
-len(vocab.items())
 
 for i, item in enumerate(list(vocab.items())[-5:]):
     print(item)
@@ -92,3 +87,28 @@ print(tokeniser.encode(text))
 
 tokeniser.decode(tokeniser.encode(text))
 print(tokeniser.decode(tokeniser.encode(text)))
+
+tokeniser = tiktoken.get_encoding("gpt2")
+
+text = (
+    "Hello, do you like tea? <|endoftext|> In the sunlit terraces"
+     "of someunknownPlace."
+)
+
+integers = tokeniser.encode(text, allowed_special={"<|endoftext|>"})
+print("Encoded text:", integers)
+decoded_text = tokeniser.decode(integers)
+print("Decoded text:", decoded_text)
+
+enc_text = tokeniser.encode(raw_text)
+print(len(enc_text))
+
+enc_sample = enc_text[50:]
+
+context_size = 4
+
+x = enc_sample[:context_size]
+y = enc_sample[1:context_size + 1]
+
+print(f"x: {x}")
+print(f"y:      {y}")
