@@ -1,10 +1,12 @@
 import os
 import re
 import importlib
-from importlib.metadata import version
 import tiktoken
+import torch
+from torch.utils.data import Dataset, DataLoader
 
 print("tiktoken version:", importlib.metadata.version("tiktoken"))
+print("pytorch version:", torch.__version__)
 
 
 with open('tokenise_text_ch02/the-verdict.txt',"r", encoding="utf-8") as f:
@@ -112,3 +114,18 @@ y = enc_sample[1:context_size + 1]
 
 print(f"x: {x}")
 print(f"y:      {y}")
+
+for i in range(1, context_size+1):
+    context = enc_sample[:i]
+    desired = enc_sample[i]
+
+    print(f"Context: {context} --> Desired: {desired}")
+    print(f"Context: {tokeniser.decode(context)} --> Desired: {tokeniser.decode([desired])}")
+
+class GPTDatasetV1(Dataset):
+    def __init__(self, txt, tokeniser, max_length, stride):
+        self.input_ids = []
+        self.target_ids = []
+
+        # Tokenise the text
+        token_ids = tokeniser.encode(txt,)
