@@ -61,16 +61,36 @@ def create_dataloader_v1(txt, batch_size=4, max_length=256, stride=128, shuffle=
     )
     return dataloader
 
-dataloader = create_dataloader_v1(
+vocab_size = 50257
+output_dim = 256
+
+token_embedding_layer = torch.nn.Embedding(vocab_size, output_dim)
+
+max_length = 4
+dataloader = create_dataloader_v1(      
     raw_text,
-    batch_size=1,
-    max_length=4,
-    stride=1,
+    batch_size=8,
+    max_length=max_length,
+    stride=4,
     shuffle=False,
     drop_last=True,
     num_workers=0
 )
 
 data_iter = iter(dataloader)
-first_batch = next(data_iter)
-print(first_batch)
+
+input_ids, target_ids = next(data_iter)
+print("Input IDs: \n", input_ids)
+print("\n Target IDs: \n ", target_ids)
+
+token_embeddings = token_embedding_layer(input_ids)
+print(token_embeddings.shape)
+
+context_length = max_length
+pos_embedding_layer = torch.nn.Embedding(context_length, output_dim)
+
+pos_embeddings = pos_embedding_layer(torch.arange(context_length))
+print(pos_embeddings.shape)
+
+input_embeddings = token_embeddings + pos_embeddings
+print(input_embeddings.shape)
